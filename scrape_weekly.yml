@@ -1,0 +1,63 @@
+name: Weekly TFRRS Scrape - Big South
+
+on:
+  schedule:
+  # Min Hr Day Mon WkDay
+    - cron: "0 5 * * 1" # 5am because UTC not EST
+
+  # Add button so we can test the workflow manually
+  workflow_dispatch:
+
+permissions:
+# Grants permission to write output file
+  contents: write
+
+jobs:
+  scrape:
+  # Ubuntu is a temporary computer created by Github
+  # This allows us to run the scraper automatically without our actual computer being on
+  # -latest uses the latest version
+    runs-on: ubuntu-latest
+
+    steps:
+    # name: what you see in the Actions page
+    # uses: calls Github function, where @v5 means version 5
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: | # Everything after this will be run in the shell
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run scraper
+        run: python scrape_tfrrs_big_south.py
+
+      - name: Confirm output file exists
+        run: |
+          if [ ! -f "big_south_tfrrs_performances.csv" ]; then
+            echo "ERROR: CSV file not created."
+            exit 1
+          fi
+
+      - name: Commit updated CSV
+        run: |
+        # Create bot to make commit since the computer is running it,
+        # not a user with a name and email address account
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add big_south_tfrrs_performances.csv
+
+        # Check to see whether the file was updated
+          if git diff --cached --quiet; then
+            echo "No changes made to the file."
+          else
+            git commit -m "Updated Big South TFRRS data."
+            git push
+          fi
