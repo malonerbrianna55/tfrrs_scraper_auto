@@ -47,14 +47,14 @@ jobs:
 
       - name: Commit updated CSV
         run: |
-        # Create bot to make commit since the computer is running it,
-        # not a user with a name and email address account
+          # Create bot to make commit since the computer is running it
+          # not a user with a name and email address account
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add big_south_tfrrs_performances.csv
 
-        # Check to see whether the file was updated
+          # Check to see whether the file was updated
           if git diff --cached --quiet; then
             echo "No changes made to the file."
           else
