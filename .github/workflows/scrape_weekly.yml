@@ -1,4 +1,4 @@
-name: Weekly TFRRS Scrape - Big South
+name: Weekly TFRRS Scrape - NCAA D1
 
 on:
   schedule:
@@ -36,11 +36,11 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run scraper
-        run: python scrape_tfrrs_big_south.py
+        run: python scrape_tfrrs_NCAA.py
 
       - name: Confirm output file exists
         run: |
-          if [ ! -f "big_south_tfrrs_performances.csv" ]; then
+          if [ ! -f "ncaa_tfrrs_performances.csv" ]; then
             echo "ERROR: CSV file not created."
             exit 1
           fi
@@ -52,12 +52,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add big_south_tfrrs_performances.csv
+          git add ncaa_tfrrs_performances.csv
 
           # Check to see whether the file was updated
           if git diff --cached --quiet; then
             echo "No changes made to the file."
           else
-            git commit -m "Updated Big South TFRRS data."
+            git commit -m "Updated NCAA TFRRS data."
             git push
           fi
