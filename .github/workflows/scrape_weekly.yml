@@ -36,7 +36,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run scraper
-        run: python scrape_tfrrs_NCAA.py --limit 3
+        run: python scrape_tfrrs_NCAA.py
 
       - name: Confirm output file exists
         run: |
