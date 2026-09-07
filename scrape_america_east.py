@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 import scrape_tfrrs_hpu
 
 # Big South conference league page
-BIG_SOUTH_LEAGUE_URL = "https://www.tfrrs.org/leagues/61.html"
+AMERICA_EAST_LEAGUE_URL = "https://www.tfrrs.org/leagues/61.html"
 CONFERENCE_NAME = "AMERICA EAST"
 BASE = "https://www.tfrrs.org"
 
