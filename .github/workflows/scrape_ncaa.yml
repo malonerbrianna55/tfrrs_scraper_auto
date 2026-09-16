@@ -46,9 +46,9 @@ jobs:
             artifact: big_sky-results
 
           - conference: Big Ten
-            script: scrape_big_10.py
-            csv: big_10_tfrrs_performances.csv
-            artifact: big_10-results
+            script: scrape_big_ten.py
+            csv: big_ten_tfrrs_performances.csv
+            artifact: big_ten-results
 
           - conference: Big West
             script: scrape_big_west.py
