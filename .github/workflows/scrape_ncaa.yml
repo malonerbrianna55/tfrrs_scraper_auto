@@ -1,0 +1,228 @@
+name: Scrape All NCAA Conferences
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+
+  scrape:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+
+          - conference: ACC
+            script: scrape_acc.py
+            csv: acc_tfrrs_performances.csv
+            artifact: acc-results
+
+          - conference: ASUN
+            script: scrape_asun.py
+            csv: asun_tfrrs_performances.csv
+            artifact: asun-results
+
+          - conference: Atlantic 10
+            script: scrape_atlantic_10.py
+            csv: atlantic_10_tfrrs_performances.csv
+            artifact: atlantic_10-results
+
+          - conference: Big 12
+            script: scrape_big_12.py
+            csv: big_12_tfrrs_performances.csv
+            artifact: big_12-results
+
+          - conference: Big East
+            script: scrape_big_east.py
+            csv: big_east_tfrrs_performances.csv
+            artifact: big_east-results
+
+          - conference: Big Sky
+            script: scrape_big_sky.py
+            csv: big_sky_tfrrs_performances.csv
+            artifact: big_sky-results
+
+          - conference: Big Ten
+            script: scrape_big_10.py
+            csv: big_10_tfrrs_performances.csv
+            artifact: big_10-results
+
+          - conference: Big West
+            script: scrape_big_west.py
+            csv: big_west_tfrrs_performances.csv
+            artifact: big_west-results
+
+          - conference: CAA
+            script: scrape_caa.py
+            csv: caa_tfrrs_performances.csv
+            artifact: caa-results
+
+          - conference: Conference USA
+            script: scrape_conference_usa.py
+            csv: conference_usa_tfrrs_performances.csv
+            artifact: conf_usa-results
+
+          - conference: Horizon League
+            script: scrape_horizon_league.py
+            csv: horizon_tfrrs_performances.csv
+            artifact: horizon-results
+
+          - conference: Ivy League
+            script: scrape_ivy_league.py
+            csv: ivy_league_tfrrs_performances.csv
+            artifact: ivy_league-results
+
+          - conference: MEAC
+            script: scrape_meac.py
+            csv: meac_tfrrs_performances.csv
+            artifact: meac-results
+
+          - conference: Metro
+            script: scrape_metro.py
+            csv: metro_tfrrs_performances.csv
+            artifact: metro-results
+
+          - conference: Mid-American
+            script: scrape_mid_american.py
+            csv: mid_american_tfrrs_performances.csv
+            artifact: mid_american-results
+
+          - conference: Missouri Valley
+            script: scrape_missouri_valley.py
+            csv: missouri_valley_tfrrs_performances.csv
+            artifact: miss_valley-results
+
+          - conference: Mountain West
+            script: scrape_mountain_west.py
+            csv: mountain_west_tfrrs_performances.csv
+            artifact: mountain_west-results
+
+          - conference: NEC
+            script: scrape_nec.py
+            csv: nec_tfrrs_performances.csv
+            artifact: nec-results
+
+          - conference: Ohio Valley
+            script: scrape_ohio_valley.py
+            csv: ohio_valley_tfrrs_performances.csv
+            artifact: ohio_valley-results
+
+          - conference: Patriot League
+            script: scrape_patriot_league.py
+            csv: patriot_tfrrs_performances.csv
+            artifact: patriot-results
+
+          - conference: SEC
+            script: scrape_sec.py
+            csv: sec_tfrrs_performances.csv
+            artifact: sec-results
+
+          - conference: Southern Conference
+            script: scrape_southern_c.py
+            csv: southern_c_tfrrs_performances.csv
+            artifact: southern-results
+
+          - conference: Southland
+            script: scrape_southland.py
+            csv: southland_tfrrs_performances.csv
+            artifact: southland-results
+
+          - conference: Summit
+            script: scrape_summit.py
+            csv: summit_tfrrs_performances.csv
+            artifact: summit-results
+
+          - conference: Sun Belt
+            script: scrape_sun_belt.py
+            csv: sun_belt_tfrrs_performances.csv
+            artifact: sun_belt-results
+
+          - conference: SWAC
+            script: scrape_swac.py
+            csv: swac_tfrrs_performances.csv
+            artifact: swac-results
+
+          - conference: The American
+            script: scrape_the_american.py
+            csv: american_tfrrs_performances.csv
+            artifact: american-results
+
+          - conference: WAC
+            script: scrape_wac.py
+            csv: wac_tfrrs_performances.csv
+            artifact: wac-results
+
+          - conference: WCC
+            script: scrape_wcc.py
+            csv: wcc_tfrrs_performances.csv
+            artifact: wcc-results
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run scraper
+        run: |
+          python "${{ matrix.script }}"
+
+      - name: Upload conference CSV
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.artifact }}"
+          path: "${{ matrix.csv }}"
+
+
+  combine:
+    needs: scrape
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pandas
+        run: |
+          pip install pandas
+
+      - name: Download all conference CSVs
+        uses: actions/download-artifact@v4
+        with:
+          path: conference_results
+          merge-multiple: true
+
+      - name: Combine conference files
+        run: |
+          python combine_conferences.py
+
+      - name: Commit combined NCAA CSV
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add ncaa_tfrrs_performances.csv
+
+          if git diff --cached --quiet; then
+            echo "No changes made."
+          else
+            git commit -m "Update combined NCAA TFRRS dataset"
+            git push
+          fi
