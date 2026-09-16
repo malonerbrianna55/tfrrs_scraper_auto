@@ -48,5 +48,5 @@ jobs:
       - name: Upload CAA CSV # to github
         uses: actions/upload-artifact@v4
         with:
-          name: acc_tfrrs_performances
-          path: acc_tfrrs_performances.csv
+          name: caa_tfrrs_performances
+          path: caa_tfrrs_performances.csv
