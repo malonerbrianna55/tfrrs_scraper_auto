@@ -48,5 +48,5 @@ jobs:
       - name: Upload The American CSV # to github
         uses: actions/upload-artifact@v4
         with:
-          name: american_tfrrs_performances
-          path: american_tfrrs_performances.csv
+          name: atlantic_10_tfrrs_performances
+          path: atlantic_10_tfrrs_performances.csv
