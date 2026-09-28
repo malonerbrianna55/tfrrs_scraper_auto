@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
 # Reuse HPU scraper for roster + athlete performance scraping
-import scrape_tfrrs_hpu
+import scrape_team_functions
 
 # Horizon League page
 HORIZON_LEAGUE_URL = "https://www.tfrrs.org/leagues/69.html"
@@ -83,12 +83,12 @@ def main():
     args = parser.parse_args()
 
     # Reuse the same session and anti-blocking behavior as the HPU scraper
-    session = scrape_tfrrs_hpu.get_session()
-    scrape_tfrrs_hpu.delay()
+    session = scrape_team_functions.get_session()
+    scrape_team_functions.delay()
 
     # Step 1: Fetch the conference league page
     print(f"Fetching conference page: {HORIZON_LEAGUE_URL}")
-    soup = scrape_tfrrs_hpu.fetch(session, HORIZON_LEAGUE_URL)
+    soup = scrape_team_functions.fetch(session, HORIZON_LEAGUE_URL)
     if not soup:
         print("Failed to fetch conference page. Exiting.")
         return
@@ -100,15 +100,16 @@ def main():
 
     # Step 3: Use team scraping function
     # from HPU scraper to fetch each team's roster and athlete performances
-    scrape_tfrrs_hpu.scrape_teams(
+    scrape_team_functions.scrape_teams(
         team_urls,
         session=session,
         limit=args.limit,
         output_path="horizon_tfrrs_performances.csv",
+        conference = CONFERENCE_NAME
     )
 
 
 if __name__ == "__main__":
     main()
 
-# Total run time: ~ minutes, seconds
+# Total run time: 1 hour, 1 minute, 42 seconds
