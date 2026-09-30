@@ -336,35 +336,7 @@ def parse_athlete_performances(soup, athlete_info):
     """
     Parse an athlete's profile page to extract all their performances.
     
-    This is STEP 2 of the scraping process. Each athlete profile page contains
-    multiple tables with performance data. The structure is:
-    
-    Meet Results Table Structure:
-        <table>
-            <tr>
-                <td>Meet Name</td>
-                <td>Feb 6- 7, 2026</td>  <!-- Date row (header for this meet) -->
-            </tr>
-            <tr>
-                <td>200</td>              <!-- Event name -->
-                <td><a href="...">21.85</a></td>  <!-- Mark (performance) -->
-                <td>6th (F)</td>          <!-- Place -->
-            </tr>
-            <tr>
-                <td>400</td>
-                <td><a href="...">47.63</a></td>
-                <td>1st (F)</td>
-            </tr>
-            <!-- Next meet starts with another date row... -->
-        </table>
-    
-    The challenge: We need to:
-    1. Identify rows that contain dates (these mark the start of a new meet)
-    2. Track the current date as we process rows
-    3. Extract event names and marks from performance rows
-    4. Skip rows from other tables (like "College Bests" which has different structure)
-    
-    Args:
+    Arguments:
         soup: BeautifulSoup object containing the athlete's profile page HTML
         athlete_info: Dictionary with name, class, gender from roster parsing
         
@@ -403,26 +375,24 @@ def parse_athlete_performances(soup, athlete_info):
                     class_ = name_match.group(2)
             break
 
-    # Extract school name from page header (e.g., "HIGH POINT")
-    # The school name is typically shown in an h3 or h4 tag near the top
+    # Extract school name from page header (ex. "HIGH POINT")
+    # The school name is shown in an h3 tag near the top
     school_name = ""
-    for h in soup.find_all(["h3", "h4"]):
+    for h in soup.find_all(["h3"]):
         header_text = (h.get_text() or "").strip().upper()
         # Skip if it's the athlete name header (contains parentheses with class)
-        if "(" in header_text and ")" in header_text:
+        if "(FR-1)" in header_text or "(SO-2)" in header_text or "(JR-3)" in header_text or "(SR-4)" in header_text or "(RS/Una)" in header_text:
             continue
-        # Look for school name - it's usually a short name like "HIGH POINT"
-        # and appears after the athlete name header
-        if header_text and len(header_text) < 50 and header_text != name.upper():
+        # Look for school name, it appears after the athlete name header
+        if header_text and header_text != name.upper():
             school_name = header_text
             break
 
     # For transfer athletes, TFRRS inserts a <div class="col-lg-12 transfer"> marker
     # between the current-school meet results and the prior-school meet results
-    # We will walk through in order and flag when we pass the transfer marker,
-    # so each table gets the right school.
+    # Walk through in order and flag when we pass the transfer marker so each table gets the right school.
 
-    # Find the transfer marker div (class includes "transfer")
+    # Find the transfer marker div
     transfer_marker = soup.find("div", class_="transfer")
     competing_for_school = None
     if transfer_marker:
@@ -603,7 +573,7 @@ def scrape_teams(team_urls, session=None, limit=0, output_path="tfrrs_performanc
                 row["conference"] = conference
             all_rows.extend(perfs)
             print(f"    Found {len(perfs)} performances")
-    fieldnames = ["name", "event", "mark", "performance_date", "year", "acad_year", "current_class", "class_at_mark", "gender", "transfer", "school", "conference"]
+    fieldnames = ["name", "event", "mark", "performance_date", "year", "acad_year", "current_class", "class_at_mark", "gender", "transfer", "school"]
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=fieldnames)
         w.writeheader()
