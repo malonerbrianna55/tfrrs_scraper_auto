@@ -509,7 +509,6 @@ def parse_athlete_performances(soup, athlete_info):
                 "gender": gender,
                 "transfer": transfer,
                 "school": table_school,
-                "conference": CONFERENCE_NAME
             })
 
     ########################################################################
