@@ -508,7 +508,7 @@ def parse_athlete_performances(soup, athlete_info):
                 "current_class": class_,
                 "gender": gender,
                 "transfer": transfer,
-                "school": table_school,
+                "school": table_school
             })
 
     ########################################################################
