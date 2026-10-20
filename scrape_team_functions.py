@@ -343,15 +343,14 @@ def parse_athlete_performances(soup, athlete_info):
     Returns:
         list: List of dictionaries, each representing one performance:
             - name: Athlete's name
-            - event: Event name (e.g., "200", "Mile", "High Jump")
-            - mark: Performance result (e.g., "21.85", "4:13.15", "2.08m")
-            - performance_date: Clean date string (e.g., "Feb 7, 2026")
-            - year: Extracted year (e.g., "2026")
+            - event: Event name (ex. "200", "Mile", "High Jump")
+            - mark: Performance result (ex. "21.85", "4:13.15", "2.08m")
+            - performance_date: Clean date string (ex. "Feb 7, 2026")
+            - year: Extracted year (ex. "2026")
             - class: Academic class (FR/SO/JR/SR/RS)
             - gender: M or F
             - transfer: Yes or No
-            - school: School name where athlete was competing (e.g., "HIGH POINT")
-            - conference: Name of the conference that the school competes in
+            - school: School name where athlete was competing (ex. "HIGH POINT")
     """
     # Start with athlete info from the roster
     name = athlete_info.get("name", "")
@@ -508,7 +507,8 @@ def parse_athlete_performances(soup, athlete_info):
                 "current_class": class_,
                 "gender": gender,
                 "transfer": transfer,
-                "school": table_school
+                "school": table_school,
+                "conference": CONFERENCE_NAME
             })
 
     ########################################################################
@@ -572,7 +572,7 @@ def scrape_teams(team_urls, session=None, limit=0, output_path="tfrrs_performanc
                 row["conference"] = conference
             all_rows.extend(perfs)
             print(f"    Found {len(perfs)} performances")
-    fieldnames = ["name", "event", "mark", "performance_date", "year", "acad_year", "current_class", "class_at_mark", "gender", "transfer", "school"]
+    fieldnames = ["name", "event", "mark", "performance_date", "year", "acad_year", "current_class", "class_at_mark", "gender", "transfer", "school","conference"]
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=fieldnames)
         w.writeheader()
@@ -619,7 +619,7 @@ def main():
         session=session,
         limit=args.limit,
         output_path="high_point_tfrrs_performances.csv",
-        conference=CONFERENCE_NAME,
+        conference=CONFERENCE_NAME
     )
 
 
