@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
 # Reuse HPU scraper for roster + athlete performance scraping
-import scrape_tfrrs_hpu
+import scrape_team_functions
 
 # Big South conference league page
 AMERICA_EAST_LEAGUE_URL = "https://www.tfrrs.org/leagues/61.html"
@@ -75,7 +75,7 @@ def extract_teams_from_conference_page(soup, conference_name):
 
 def main():
     # Run the America East scrape: fetch conference page, parse team list, scrape
-    # each team (rosters and performances) via scrape_tfrrs_hpu.
+    # each team (rosters and performances) via scrape_team_functions.
     # --limit for testing with fewer athletes per team
     
     parser = argparse.ArgumentParser(description="Scrape TFRRS for America East Conference.")
@@ -83,12 +83,12 @@ def main():
     args = parser.parse_args()
 
     # Reuse the same session and anti-blocking behavior as the HPU scraper
-    session = scrape_tfrrs_hpu.get_session()
-    scrape_tfrrs_hpu.delay()
+    session = scrape_team_functions.get_session()
+    scrape_team_functions.delay()
 
     # Step 1: Fetch the conference league page
     print(f"Fetching conference page: {AMERICA_EAST_LEAGUE_URL}")
-    soup = scrape_tfrrs_hpu.fetch(session, AMERICA_EAST_LEAGUE_URL)
+    soup = scrape_team_functions.fetch(session, AMERICA_EAST_LEAGUE_URL)
     if not soup:
         print("Failed to fetch conference page. Exiting.")
         return
@@ -96,11 +96,11 @@ def main():
     # Step 2: Parse the page to get all team URLs
     teams = extract_teams_from_conference_page(soup, CONFERENCE_NAME)
     team_urls = [url for (_name, _gender, url) in teams]
-    print(f"Found {len(team_urls)} teams. Scraping via scrape_tfrrs_hpu...\n")
+    print(f"Found {len(team_urls)} teams. Scraping via scrape_team_functions...\n")
 
     # Step 3: Use team scraping function
-    # from HPU scraper to fetch each team's roster and athlete performances
-    scrape_tfrrs_hpu.scrape_teams(
+    # from team scraper to fetch each team's roster and athlete performances
+    scrape_team_functions.scrape_teams(
         team_urls,
         session=session,
         limit=args.limit,
