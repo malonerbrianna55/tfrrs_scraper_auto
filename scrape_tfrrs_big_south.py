@@ -84,7 +84,7 @@ def extract_teams_from_conference_page(soup, conference_name):
 
 def main():
     # Run the Big South scrape: fetch conference page, parse team list, scrape
-    # each team (rosters and performances) via scrape_tfrrs_hpu.
+    # each team (rosters and performances) via scrape_team_functions.
 
     # --limit for testing with fewer athletes per team
     parser = argparse.ArgumentParser(description="Scrape TFRRS for Big South Conference.")
@@ -93,7 +93,7 @@ def main():
 
     # Reuse the same session and anti-blocking behavior as the HPU scraper
     session = scrape_team_functions.get_session()
-    scrape_tfrrs_hpu.delay()
+    scrape_team_functions.delay()
 
     # Step 1: Fetch the conference league page
     print(f"Fetching conference page: {BIG_SOUTH_LEAGUE_URL}")
@@ -105,10 +105,10 @@ def main():
     # Step 2: Parse the page to get all team URLs
     teams = extract_teams_from_conference_page(soup, CONFERENCE_NAME)
     team_urls = [url for (_name, _gender, url) in teams]
-    print(f"Found {len(team_urls)} teams. Scraping via scrape_tfrrs_hpu...\n")
+    print(f"Found {len(team_urls)} teams. Scraping via scrape_team_functions...\n")
 
     # Step 3: Use team scraping function
-    # from HPU scraper to fetch each team's roster and athlete performances
+    # from team scraper to fetch each team's roster and athlete performances
     scrape_team_functions.scrape_teams(
         team_urls,
         session=session,
